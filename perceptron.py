@@ -34,18 +34,25 @@ class Perceptron():
         if prediction == actual:
             return weight
         else:
-            return weight + self.learningRate * (actual - prediction) * float(input)
+            return weight + self.learningRate * (actual - prediction) * input
     
     # Trains the perceptron on traininLength apples
-    def train(self, trainingLength = 4000):
-        self.weights = [-0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5]
+    def train(self, trainingLength = 4000, resetWeights = True):
+        
+        # Resets weights
+        if resetWeights:
+            self.weights = [-0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5]
+        
+        # Trains    
         for i in range(trainingLength):
             apple = self.apples[i]
             prediction = self.predict(apple)
             actual = self.qualityToInt(apple[self.quality])
             
+            # Updates weights
             for i in range(self.numInputs):
-                self.weights[i] = self.updateWeight(prediction, actual, apple[self.fields[i]], self.weights[i])    
+                input = float(apple[self.fields[i]])
+                self.weights[i] = self.updateWeight(prediction, actual, input, self.weights[i])    
     
     # Test the perceptron with static weight values. Prints output
     def test(self, testLength = 4000):
