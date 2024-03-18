@@ -1,0 +1,8 @@
+What I Have to Do --
+- For each bin of each input, need to find the probability that the apple is good given that 
+  the input is in that bin
+
+Storing Probabilites --
+- array of dictionaries with a length of equivalent to the number of bins
+- Each dictionary will be of the form (field, prob) where field is an input category and prob
+  is the probabilty that the apple is good given that the input is contained within that bin
