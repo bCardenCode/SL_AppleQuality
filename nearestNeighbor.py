@@ -38,37 +38,85 @@ class nearestNeighbor():
         return math.sqrt(sumFeatures)
     
 
-    # Trains the perceptron on traininLength apples
-    def train(self, trainingLength):
-        
-        for i in range(trainingLength):
+    # test the k-nn algorithm
+    def test(self, trainingLength):
+
+        # gets the # of rows to train on and test
+        trainingRows = int(trainingLength * len(model.apples))
+
+        # for each apple in the testing set
+        for i in range(trainingRows, len(model.apples)):
             apple = self.apples[i]
-            prediction = self.predict(apple)
-            actual = self.qualityToInt(apple[self.quality])
-            
-            for i in range(self.numInputs):
-                self.weights[i] = self.updateWeight(prediction, actual, apple[self.fields[i]], self.weights[i])    
-    
-    # Test the perceptron with static weight values. Prints output
-    def test(self, testLength):
-        correctPredictions = 0
-        for i in range(testLength):
-            apple = self.apples[i]
-            appleQuality = self.qualityToInt(apple[self.quality])
-            if appleQuality == self.predict(apple):
-                correctPredictions += 1
+
+            # find the k closest apples out of the training set
+            closestApples = [100 for i in range(self.k)]
+            classification = [0.5 for i in range(self.k)]
+            for j in range(trainingRows):
+                
+                if i == j:
+                    continue
+                else:
+                    distance = self.EuclideanDistance(apple[1:-1], self.apples[j][1:-1])
+
+                    # if distance is one of the closest
+
+                    max_value = max(closestApples)
+                    
+                    if(distance < max_value):
+                        change = closestApples.index(max_value)
+                        closestApples[change] = distance
+                        classification[change] = self.apples[j][-1]
+                
+                
         
-        print("Score: ", correctPredictions, "/", testLength, "(", correctPredictions / testLength * 100, "%)")        
+            averageClassification = sum(classification)/self.k
+
+            if averageClassification >= 0.5:
+                print("good")
+                # apple[-1] = 1
+            else:
+                print("bad")
+                # apple[-1] = 0
+
+        # for i in range(trainingLength):
+        #     apple = self.apples[i]
+
+        #     # find the k closest apples
+        #     closestApples = [100 for i in range(self.k)]
+        #     for j in range(trainingLength):
+        #         if i == j:
+        #             continue
+        #         else:
+        #             distance = self.EuclideanDistance(apple[1:-1], self.apples[j][1:-1])
+
+        #             # if distance is one of the closest
+        #             min_value = max(closestApples)
+        #             if(distance < min_value):
+        #                 closestApples.index(min_value)  
         
+        #     sum = 0
+        #     for i in range(self.k):
+        #         sum += closestApples[i]
+        #     sum = sum / self.k
+
+        #     if sum >= 0.5:
+        #         print("good")
+        #         apple[-1] = 1
+        #     else:
+        #         print("bad")
+        #         apple[-1] = 0
+        
+
+
 if __name__ == "__main__":
     model = nearestNeighbor()
     trainingLengths = [0.5, 0.7, 0.75, 0.8, 0.9, 0.9]
 
     # [1:-1] removes the id and the quality from the apple
-    print(type(model.apples[0]))
-    print(model.apples[0][1:-1])
-    print(model.apples[1][1:-1])
-    print("euclidean distance between 2:", model.EuclideanDistance(model.apples[0][1:-1], model.apples[1][1:-1]))
+    
+    model.test(trainingLength = 0.75)
+    print("done")
+  
 
     # for length in trainingLengths:
     #     trainingRows = int(length * len(model.apples))
