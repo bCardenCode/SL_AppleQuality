@@ -12,12 +12,6 @@ class nearestNeighbor():
         self.k = k
         self.quality = "Quality"
     
-    # Converts 'good' or 'bad' to 1 or -1
-    def qualityToInt(self, quality):
-        if quality == 'good':
-            return 1
-        else:
-            return -1
         
     def EuclideanDistance(self, x, y):
      
@@ -41,17 +35,16 @@ class nearestNeighbor():
     # test the k-nn algorithm
     def test(self, trainingLength):
 
-        # gets the # of rows to train on and test
-        trainingRows = int(trainingLength * len(model.apples))
+        prediction = []
 
         # for each apple in the testing set
-        for i in range(trainingRows, len(model.apples)):
+        for i in range(trainingLength, len(model.apples)):
             apple = self.apples[i]
 
             # find the k closest apples out of the training set
             closestApples = [100 for i in range(self.k)]
             classification = [0.5 for i in range(self.k)]
-            for j in range(trainingRows):
+            for j in range(trainingLength):
                 
                 if i == j:
                     continue
@@ -72,49 +65,38 @@ class nearestNeighbor():
             averageClassification = sum(classification)/self.k
 
             if averageClassification >= 0.5:
-                print("good")
-                # apple[-1] = 1
+                # print("good")
+                prediction.append(1)
             else:
-                print("bad")
-                # apple[-1] = 0
-
-        # for i in range(trainingLength):
-        #     apple = self.apples[i]
-
-        #     # find the k closest apples
-        #     closestApples = [100 for i in range(self.k)]
-        #     for j in range(trainingLength):
-        #         if i == j:
-        #             continue
-        #         else:
-        #             distance = self.EuclideanDistance(apple[1:-1], self.apples[j][1:-1])
-
-        #             # if distance is one of the closest
-        #             min_value = max(closestApples)
-        #             if(distance < min_value):
-        #                 closestApples.index(min_value)  
+                # print("bad")
+                prediction.append(0)
         
-        #     sum = 0
-        #     for i in range(self.k):
-        #         sum += closestApples[i]
-        #     sum = sum / self.k
+        return prediction
 
-        #     if sum >= 0.5:
-        #         print("good")
-        #         apple[-1] = 1
-        #     else:
-        #         print("bad")
-        #         apple[-1] = 0
         
-
+def calculateAccuracy(answer, prediction):
+    correct = 0
+    false = 0
+    for i in range(len(answer)):
+        if answer[i] == prediction[i]:
+            correct += 1
+        else:
+            false += 1
+    
+    return correct/(correct + false)
 
 if __name__ == "__main__":
     model = nearestNeighbor()
     trainingLengths = [0.5, 0.7, 0.75, 0.8, 0.9, 0.9]
 
-    # [1:-1] removes the id and the quality from the apple
+    # gets the # of rows to train on and test
+    trainingLength = 0.75
+    trainingRows = int(trainingLength * len(model.apples))
     
-    model.test(trainingLength = 0.75)
+    predection = model.test(trainingRows)
+
+    accuracyPercentage = calculateAccuracy(model.apples[trainingRows: len(model.apples), -1], predection)
+    print(f"Accuracy: {accuracyPercentage}")
     print("done")
   
 
