@@ -1,10 +1,10 @@
-from readApples import readApples
+from readApples import readApplesArray
 import numpy as np
 import math
 
 class nearestNeighbor():
     def __init__(self, k = 3):
-        self.apples = readApples()
+        self.apples = readApplesArray()
         self.weights = [-0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5]
         self.fields = ["Size", "Weight", "Sweetness", "Crunchiness", "Juiciness", "Ripeness", "Acidity"]
         self.bias = 1
@@ -25,8 +25,14 @@ class nearestNeighbor():
         # differences of the elements
         sumFeatures = 0; 
         
-        for key in x.keys():
-            sumFeatures += math.pow(x[key]-y[key], 2)
+        for i in range(len(x)):
+            # make sure the values are floats
+            if type(x[i]) == str:
+                x[i] = float(x[i])
+            if type(y[i]) == str:
+                y[i] = float(y[i])
+
+            sumFeatures += math.pow(x[i]-y[i], 2)
     
         # The square root of the sum
         return math.sqrt(sumFeatures)
@@ -58,10 +64,11 @@ if __name__ == "__main__":
     model = nearestNeighbor()
     trainingLengths = [0.5, 0.7, 0.75, 0.8, 0.9, 0.9]
 
+    # [1:-1] removes the id and the quality from the apple
     print(type(model.apples[0]))
-    print(model.apples[0][:-1])
-    print(model.apples[1][:-1])
-    print("euclidean distance between 2:", model.EuclideanDistance(model.apples[0][:-1], model.apples[1][:-1]))
+    print(model.apples[0][1:-1])
+    print(model.apples[1][1:-1])
+    print("euclidean distance between 2:", model.EuclideanDistance(model.apples[0][1:-1], model.apples[1][1:-1]))
 
     # for length in trainingLengths:
     #     trainingRows = int(length * len(model.apples))
