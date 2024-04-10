@@ -131,16 +131,14 @@ def graphExpirement(fileName):
     # Read the experiment results from the CSV file
     data = pd.read_csv(fileName)
 
-    averages = data.groupby(['k', 'Training Length'])['Accuracy', 'Completion Time'].mean()
-    print(f"\n\n{averages}\n\n")
 
-    # Group data by the "k" column
-    grouped = averages #.groupby('k')
-    for k, groupedData in grouped:
-        accuracies = groupedData['Accuracy']
-        trainingLengths = groupedData['Training Length']
-        plt.plot(trainingLengths, accuracies, label=f"k={k}")
-    
+
+
+
+    accuracies = data['Accuracy']
+    trainingLengths = data['k']
+    plt.plot(trainingLengths, accuracies)
+
 
 
     # Extract the training lengths and accuracies
@@ -150,23 +148,22 @@ def graphExpirement(fileName):
 
     # Plot the accuracy vs training length
     # plt.plot(trainingLengths, accuracies)
-    plt.xlabel("Training Length")
+    plt.xlabel("k")
     plt.ylabel("Accuracy")
-    plt.title("Accuracy vs Training Length")
-    plt.legend()
+    plt.title("Accuracy vs k")
     plt.show()
 
 
 if __name__ == "__main__":
     # for _ in range(1):
-    #     ks = [1, 3, 5, 10, 15, 20]
-    #     for k in ks:
-    #         model = nearestNeighbor(k=k)
-    #         trainingLengths = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.90, 0.95]
-    #         runAndSaveExpiriment(model, trainingLengths)
+    #      ks = [1, 3, 5, 10, 15, 20]
+    #      for k in range(25, 26):
+    #          model = nearestNeighbor(k=k)
+    #          trainingLengths = [0.75]
+    #          runAndSaveExpiriment(model, trainingLengths)
         
 
-    graphExpirement(fileName="results/experimentResults.csv")
+    graphExpirement(fileName="results/experimentResults_kvsaccuracy.csv")
 
     print("\n\n FINISH  \n\n")
   
