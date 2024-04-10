@@ -122,10 +122,8 @@ def runAndSaveExpiriment(model, trainingLengths):
         print("done")
     
     # save data from multiple runs to a CSV file
-    with open(f"results/experimentResults.csv", 'w', newline='') as file:
-        headers = ["k", "Training Length", "Accuracy", "Completion Time"]
+    with open(f"results/experimentResults.csv", 'a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(headers)
         writer.writerows(data)
 
 
@@ -133,24 +131,43 @@ def graphExpirement(fileName):
     # Read the experiment results from the CSV file
     data = pd.read_csv(fileName)
 
+    averages = data.groupby(['k', 'Training Length'])['Accuracy', 'Completion Time'].mean()
+    print(f"\n\n{averages}\n\n")
+
+    # Group data by the "k" column
+    grouped = averages #.groupby('k')
+    for k, groupedData in grouped:
+        accuracies = groupedData['Accuracy']
+        trainingLengths = groupedData['Training Length']
+        plt.plot(trainingLengths, accuracies, label=f"k={k}")
+    
+
+
     # Extract the training lengths and accuracies
-    accuracies = data['Accuracy']
-    trainingLengths = data['Training Length']
+    # accuracies = data['Accuracy']
+    # trainingLengths = data['Training Length']
     
 
     # Plot the accuracy vs training length
-    plt.plot(trainingLengths, accuracies)
+    # plt.plot(trainingLengths, accuracies)
     plt.xlabel("Training Length")
     plt.ylabel("Accuracy")
     plt.title("Accuracy vs Training Length")
+    plt.legend()
     plt.show()
 
 
 if __name__ == "__main__":
-    # model = nearestNeighbor(k=3)
-    # trainingLengths = [0.5, 0.7, 0.75, 0.8, 0.9, 0.95, 0.99]
-    # runAndSaveExpiriment(model, trainingLengths)
-    
+    # for _ in range(1):
+    #     ks = [1, 3, 5, 10, 15, 20]
+    #     for k in ks:
+    #         model = nearestNeighbor(k=k)
+    #         trainingLengths = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.90, 0.95]
+    #         runAndSaveExpiriment(model, trainingLengths)
+        
+
     graphExpirement(fileName="results/experimentResults.csv")
+
+    print("\n\n FINISH  \n\n")
   
     
