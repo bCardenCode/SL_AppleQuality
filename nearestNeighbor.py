@@ -2,6 +2,9 @@ from readApples import readApplesArray
 import numpy as np
 import math
 import csv
+import time
+import pandas as pd
+import matplotlib.pyplot as plt
 
 class nearestNeighbor():
     def __init__(self, k = 3):
@@ -45,27 +48,28 @@ class nearestNeighbor():
             # find the k closest apples out of the training set
             closestApples = [100 for i in range(self.k)]
             classification = [0.5 for i in range(self.k)]
+
+            # find the nearest neighbors out of all the training apples
             for j in range(trainingLength):
-                
-                if i == j:
-                    continue
-                else:
-                    distance = self.EuclideanDistance(apple[1:-1], self.apples[j][1:-1])
-
-                    # if distance is one of the closest
-
-                    max_value = max(closestApples)
                     
-                    if(distance < max_value):
-                        change = closestApples.index(max_value)
-                        closestApples[change] = distance
-                        classification[change] = self.apples[j][-1]
+                
+                distance = self.EuclideanDistance(apple[1:-1], self.apples[j][1:-1])
+
+                # get the furthest saved neighbor
+                max_value = max(closestApples)
+                
+                # if the new distance is less than the furthest saved neighbor
+                if(distance < max_value):
+                    # then save the new distance and classification
+                    change = closestApples.index(max_value)
+                    closestApples[change] = distance
+                    classification[change] = self.apples[j][-1]
                 
                 
-        
+            # calculate the average classification of the k closest apples
             averageClassification = sum(classification)/self.k
 
-            
+            # decide if the apple is good or bad
             if averageClassification >= 0.5:
                 # print("good")
                 prediction[i-trainingLength, -1] = 1
@@ -96,19 +100,57 @@ def saveToCSV(filename, data):
         writer = csv.writer(file)
         writer.writerows(data)
 
+    
+def runAndSaveExpiriment(model, trainingLengths):
+    data = []
+    for length in trainingLengths:
+        start_time = time.time()
+        
+        trainingRows = int(length * len(model.apples))
+
+        predection = model.test(trainingRows)
+
+        # saveToCSV(f"k({model.k})nnPrediction{length}.csv", predection)
+
+        accuracy = calculateAccuracy(model.apples[trainingRows: len(model.apples), -1], predection[:, -1])
+
+        completionTime = time.time() - start_time
+
+        # Save model.k, length, accuracy, and time to a CSV file
+        data.append([model.k, length, accuracy, completionTime])
+
+        print("done")
+    
+    # save data from multiple runs to a CSV file
+    with open(f"results/experimentResults.csv", 'w', newline='') as file:
+        headers = ["k", "Training Length", "Accuracy", "Completion Time"]
+        writer = csv.writer(file)
+        writer.writerow(headers)
+        writer.writerows(data)
+
+
+def graphExpirement(fileName):
+    # Read the experiment results from the CSV file
+    data = pd.read_csv(fileName)
+
+    # Extract the training lengths and accuracies
+    accuracies = data['Accuracy']
+    trainingLengths = data['Training Length']
+    
+
+    # Plot the accuracy vs training length
+    plt.plot(trainingLengths, accuracies)
+    plt.xlabel("Training Length")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy vs Training Length")
+    plt.show()
+
 
 if __name__ == "__main__":
-    model = nearestNeighbor()
-    trainingLengths = [0.5, 0.7, 0.75, 0.8, 0.9, 0.9]
-
-    # gets the # of rows to train on and test
-    trainingLength = 0.01
-    trainingRows = int(trainingLength * len(model.apples))
+    # model = nearestNeighbor(k=3)
+    # trainingLengths = [0.5, 0.7, 0.75, 0.8, 0.9, 0.95, 0.99]
+    # runAndSaveExpiriment(model, trainingLengths)
     
-    predection = model.test(trainingRows)
-    saveToCSV("knnPrediction.csv", predection)
-
-    calculateAccuracy(model.apples[trainingRows: len(model.apples), -1], predection[:, -1])
-    print("done")
+    graphExpirement(fileName="results/experimentResults.csv")
   
     
