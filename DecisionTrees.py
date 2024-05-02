@@ -1,13 +1,22 @@
 import numpy as np
 import readApples
 
+class Node:
+    def __init__(self, data=None, children=None, split_on = None, pred_class=None, is_leaf=False):
+        self.data = data
+        self.children = children
+        self.split_on = split_on
+        self.pred_class = pred_class
+        self.is_leaf = is_leaf
+
+        
 # Define the DecisionTree class
 class DecisionTree:
-    def __init__(self):
-        self.tree = None
+    def __init__(self, fullData, feature):
+        self.root = Node(data=fullData, split_on=feature )
 
     def fit(self, X, y):
-        self.tree = self.build_tree(X, y)
+        self.root = self.build_tree(X, y)
 
     def build_tree(self, X, y):
         # Implement your tree building algorithm here
@@ -43,8 +52,8 @@ if __name__ == "__main__":
     # # Print the shapes of the training and testing sets
     print(f"X_train len: {len(X_train)} {len(X_test)} Y: {len(y_train)} {len(y_test)}")
 
-    # # Create a decision tree classifier
-    # classifier = DecisionTree()
+    # Create a decision tree classifier
+    classifier = DecisionTree(X_train, 0)
 
     # # Train the decision tree classifier
     # classifier.fit(X_train, y_train)
