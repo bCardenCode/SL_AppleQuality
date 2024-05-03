@@ -1,5 +1,6 @@
 import numpy as np
 import readApples
+from sklearn.tree import DecisionTreeClassifier
 
 class Node:
     def __init__(self, data=None, true_node=None,false_node=None, question = None, pred_class=None, is_leaf=False, depth=0):
@@ -89,8 +90,6 @@ class DecisionTree:
             
             for apple in unique_selected_feature_apples:
                 
-            # for apple in unique_selected_feature_apples: # This is if we want to be more accurate
-
                 # save the question as a tuple
                 question = (feature_index, apple)
 
@@ -142,23 +141,6 @@ class DecisionTree:
             impurity -= label_prob ** 2
 
         return impurity
-
-    # Split the dataset into training and testing sets
-    def train_test_split(self, test_ratio=0.2):
-
-        X = self.fullData[:, 1:-1]
-        y = self.fullData[:, -1]
-        num_test_rows = int(len(X) * test_ratio)
-
-        test_indices = np.random.choice(len(X), num_test_rows, replace=False)
-        train_indices = np.array([i for i in range(len(X)) if i not in test_indices])
-
-        self.X_train = X[train_indices]
-        self.y_train = y[train_indices]
-        self.X_test = X[test_indices]
-        self.y_test = y[test_indices]
-
-        return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
     
     def predict(self, currentNode, apple): 
 
@@ -190,7 +172,17 @@ class DecisionTree:
 
             
         
+# Split the dataset into training and testing sets
+def train_test_split(data, test_ratio=0.2):
 
+    X = data[:, 1:-1]
+    y = data[:, -1]
+    num_test_rows = int(len(X) * test_ratio)
+
+    test_indices = np.random.choice(len(X), num_test_rows, replace=False)
+    train_indices = np.array([i for i in range(len(X)) if i not in test_indices])
+
+    return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
 
 # Main function
 if __name__ == "__main__":
@@ -198,24 +190,32 @@ if __name__ == "__main__":
     data = readApples.readApplesArray()
 
 
-    # Create a decision tree classifier
-    classifier = DecisionTree(fullData=data, max_depth=10, num_bins=50)
-    classifier.train_test_split()
+    # # Create a decision tree classifier
+    # classifier = DecisionTree(fullData=data, max_depth=5, num_bins=10)
 
-    # testing prints
-    # print("Length of X_train:", len(classifier.X_train)) 
-    # print("Length of y_train:", len(classifier.y_train)) 
-    # print("Length of X_test:", len(classifier.X_test)) 
-    # print("Length of y_test:", len(classifier.y_test))
+    # classifier.X_train, classifier.X_test, classifier.y_train, classifier.y_test = train_test_split(data)
 
-    # # Train the decision tree classifier
-    classifier.fit()
+    # # # Train the decision tree classifier
+    # classifier.fit()
 
-    # # Make predictions on the testing set
-    print("\n\n\n TESTING DECISION TREE\n\n\n")
-    classifier.test_decision_tree()
+    # # # Make predictions on the testing set
+    # print("\n\n\n TESTING DECISION TREE\n\n\n")
+    # classifier.test_decision_tree()
 
     # Evaluate the decision tree classifier
+
+    print("use scikit-learn to evaluate the decision tree classifier\n\n\n")
+
+    X_train, X_test, y_train, y_test = train_test_split(data)
+
+    # Create a decision tree classifier
+    clf = DecisionTreeClassifier(max_depth=5)
+    
+    clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+    print("Accuracy:", np.mean(y_pred == y_test))
+
 
 
     print("\nDone!")
