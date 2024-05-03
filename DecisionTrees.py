@@ -175,7 +175,7 @@ class DecisionTree:
 # Split the dataset into training and testing sets
 def train_test_split(data, test_ratio=0.2):
 
-    X = data[:, 1:-1]
+    X = data[:, :-1]
     y = data[:, -1]
     num_test_rows = int(len(X) * test_ratio)
 
@@ -184,37 +184,40 @@ def train_test_split(data, test_ratio=0.2):
 
     return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
 
+
+
 # Main function
 if __name__ == "__main__":
     # Load the dataset
     data = readApples.readApplesArray()
 
 
-    # # Create a decision tree classifier
-    # classifier = DecisionTree(fullData=data, max_depth=5, num_bins=10)
+    # Create a decision tree classifier
+    classifier = DecisionTree(fullData=data, max_depth=5, num_bins=10)
 
-    # classifier.X_train, classifier.X_test, classifier.y_train, classifier.y_test = train_test_split(data)
+    classifier.X_train, classifier.X_test, classifier.y_train, classifier.y_test = train_test_split(data)
 
-    # # # Train the decision tree classifier
-    # classifier.fit()
+    # # Train the decision tree classifier
+    classifier.fit()
 
-    # # # Make predictions on the testing set
-    # print("\n\n\n TESTING DECISION TREE\n\n\n")
-    # classifier.test_decision_tree()
+    # # Make predictions on the testing set
+    print("\n\n\n TESTING DECISION TREE\n\n\n")
+    classifier.test_decision_tree()
 
     # Evaluate the decision tree classifier
 
-    print("use scikit-learn to evaluate the decision tree classifier\n\n\n")
+    print("\n\n\nuse scikit-learn to evaluate the decision tree classifier\n\n\n")
 
     X_train, X_test, y_train, y_test = train_test_split(data)
 
-    # Create a decision tree classifier
-    clf = DecisionTreeClassifier(max_depth=5)
+    y_train=y_train.astype('int')    
     
-    clf.fit(X_train, y_train)
+    # Create a decision tree classifier
+    clf = DecisionTreeClassifier(criterion='gini', max_depth=5)
 
+    clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
-    print("Accuracy:", np.mean(y_pred == y_test))
+    print("Accuracy with scikit learn:", np.mean(y_pred == y_test))
 
 
 
