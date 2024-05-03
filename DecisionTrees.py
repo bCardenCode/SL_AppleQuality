@@ -2,10 +2,10 @@ import numpy as np
 import readApples
 
 class Node:
-    def __init__(self, data=None, children=None, split_on = None, pred_class=None, is_leaf=False, depth=0):
+    def __init__(self, data=None, children=None, question = None, pred_class=None, is_leaf=False, depth=0):
         self.data = data
         self.children = children
-        self.split_on = split_on
+        self.question = question
         self.pred_class = pred_class
         self.is_leaf = is_leaf
         self.depth = depth
@@ -14,12 +14,11 @@ class Node:
         
 # Define the DecisionTree class
 class DecisionTree:
-    def __init__(self, fullData, split_on, max_depth=5):
-        self.root = Node(data=fullData, split_on=split_on)
+    def __init__(self, fullData, max_depth=5):
+        self.root =None
         self.max_depth = max_depth
-        self.current_depth = 0
         self.fullData = fullData
-        self.num_features = len(fullData[0]) - 1
+        self.num_features = len(fullData[0])-2
         self.X_train = None
         self.y_train = None
         self.X_test = None
@@ -27,24 +26,32 @@ class DecisionTree:
 
     # start at the root node and recursively split the data
     def fit(self):
-        self.build_tree(self.fullData, self.current_depth)
+        self.root = self.build_tree(data=self.fullData, depth=0)
 
     def build_tree(self, data, depth):
 
         # find best split
         best_gain, best_question = self.find_split(data)
         print(f"Best Gain: {best_gain}, Best Question: {best_question}")
-        return 0
+
     
         # if no split is found, make the node a leaf node
+        if best_gain == 0 or depth >= self.max_depth:
+            print("No split found or max depth reached. Making leaf node...")
+            return Node(data=data, pred_class=[np.sum(data[:, -1] == 0), np.sum(data[:, -1] == 1)], is_leaf=True, depth=depth)
+        
 
         # split the data true/false on the best split
+        true_rows, false_rows = self.question_split(data, best_question)
 
         # build tree for true
+        true_node = self.build_tree(true_rows, depth + 1)
 
         # build tree for false
+        false_node = self.build_tree(false_rows, depth + 1)
 
         # return node
+        return Node(data=data, children=[true_node, false_node], question=best_question, depth=depth)
 
 
 
@@ -57,11 +64,20 @@ class DecisionTree:
 
         # for each feature
         for feature_index in range(self.num_features): 
+            # print(f"\nfinding best split of feature: {feature_index}")
 
             # get the unique values of the selected feature
-            unique_selected_feature_apples = set([apple[feature_index] for apple in data]) 
+            unique_selected_feature_apples = [apple[feature_index] for apple in data]
+            # print(f"unique_selected_feature_apples: {unique_selected_feature_apples}")
 
-            for apple in unique_selected_feature_apples: 
+            # to increase speed we can split the features into bins
+
+            num_bins = 10
+            bins = np.linspace(unique_selected_feature_apples[0], unique_selected_feature_apples[-1], num_bins + 1)
+            # print(f"bins: {bins}")
+            for apple in bins:
+                
+            # for apple in unique_selected_feature_apples: # This is if we want to be more accurate
 
                 # save the question as a tuple
                 question = (feature_index, apple)
@@ -119,7 +135,7 @@ class DecisionTree:
     # Split the dataset into training and testing sets
     def train_test_split(self, test_ratio=0.2):
 
-        X = self.fullData[:, :-1]
+        X = self.fullData[:, 1:-1]
         y = self.fullData[:, -1]
         num_test_rows = int(len(X) * test_ratio)
 
@@ -140,7 +156,7 @@ if __name__ == "__main__":
 
 
     # Create a decision tree classifier
-    classifier = DecisionTree(fullData=data, split_on=0, max_depth=5)
+    classifier = DecisionTree(fullData=data, max_depth=5)
     classifier.train_test_split()
 
     # testing prints
