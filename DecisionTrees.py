@@ -2,9 +2,10 @@ import numpy as np
 import readApples
 
 class Node:
-    def __init__(self, data=None, children=None, question = None, pred_class=None, is_leaf=False, depth=0):
+    def __init__(self, data=None, true_node=None,false_node=None, question = None, pred_class=None, is_leaf=False, depth=0):
         self.data = data
-        self.children = children
+        self.true_node = true_node
+        self.false_node = false_node
         self.question = question
         self.pred_class = pred_class
         self.is_leaf = is_leaf
@@ -14,11 +15,12 @@ class Node:
         
 # Define the DecisionTree class
 class DecisionTree:
-    def __init__(self, fullData, max_depth=5):
+    def __init__(self, fullData, num_bins, max_depth=5):
         self.root =None
         self.max_depth = max_depth
         self.fullData = fullData
         self.num_features = len(fullData[0])-2
+        self.num_bins = num_bins
         self.X_train = None
         self.y_train = None
         self.X_test = None
@@ -29,6 +31,7 @@ class DecisionTree:
         self.root = self.build_tree(data=self.fullData, depth=0)
 
     def build_tree(self, data, depth):
+        print(f"\n\nBuilding tree at depth: {depth}")
 
         # find best split
         best_gain, best_question = self.find_split(data)
@@ -37,8 +40,17 @@ class DecisionTree:
     
         # if no split is found, make the node a leaf node
         if best_gain == 0 or depth >= self.max_depth:
-            print("No split found or max depth reached. Making leaf node...")
-            return Node(data=data, pred_class=[np.sum(data[:, -1] == 0), np.sum(data[:, -1] == 1)], is_leaf=True, depth=depth)
+            if best_gain == 0:
+                print("No split found. Making leaf node...")
+            if depth >= self.max_depth:
+                print("Max depth reached. Making leaf node...")
+
+            num_bad = np.sum(data[:, -1] == 0)
+            num_good = np.sum(data[:, -1] == 1)
+            answer = 0 if num_bad > num_good else 1
+            # [np.sum(data[:, -1] == 0), np.sum(data[:, -1] == 1)]
+
+            return Node(data=data, pred_class=answer, is_leaf=True, depth=depth)
         
 
         # split the data true/false on the best split
@@ -51,7 +63,7 @@ class DecisionTree:
         false_node = self.build_tree(false_rows, depth + 1)
 
         # return node
-        return Node(data=data, children=[true_node, false_node], question=best_question, depth=depth)
+        return Node(data=data, true_node=true_node, false_node=false_node, question=best_question, depth=depth)
 
 
 
@@ -70,12 +82,12 @@ class DecisionTree:
             unique_selected_feature_apples = [apple[feature_index] for apple in data]
             # print(f"unique_selected_feature_apples: {unique_selected_feature_apples}")
 
-            # to increase speed we can split the features into bins
 
-            num_bins = 10
-            bins = np.linspace(unique_selected_feature_apples[0], unique_selected_feature_apples[-1], num_bins + 1)
-            # print(f"bins: {bins}")
-            for apple in bins:
+            # splitting into bins can increase the speed but decreases accuracy of best split
+            if self.num_bins > 0:
+                unique_selected_feature_apples = np.linspace(unique_selected_feature_apples[0], unique_selected_feature_apples[-1], self.num_bins + 1)
+            
+            for apple in unique_selected_feature_apples:
                 
             # for apple in unique_selected_feature_apples: # This is if we want to be more accurate
 
@@ -88,7 +100,6 @@ class DecisionTree:
 
                 # skip if the split is not valid
                 if len(true_rows) == 0 or len(false_rows) == 0:
-                    print(f"true_rows = {len(true_rows)} and false_rows = {len(false_rows)}. Skipping...")
                     continue
 
                 # Calculate the information gain from this split
@@ -148,6 +159,38 @@ class DecisionTree:
         self.y_test = y[test_indices]
 
         return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
+    
+    def predict(self, currentNode, apple): 
+
+        if currentNode.is_leaf:
+            returnVal = currentNode.pred_class
+            return currentNode.pred_class
+                
+        feature_index, value = currentNode.question
+
+        if float(apple[feature_index]) >= value:
+            return self.predict(currentNode.true_node, apple)
+        else:
+            return self.predict(currentNode.false_node, apple)
+    
+    def test_decision_tree(self):
+        correct = 0
+        incorrect = 0
+
+        for apple, trueLabel in zip(self.X_test, self.y_test):
+            predictionLabel = self.predict(self.root, apple)
+            
+            if predictionLabel == trueLabel:
+                correct += 1
+            else:
+                incorrect += 1
+
+        print(f"Correct: {correct}, Incorrect: {incorrect}, Accuracy: {correct / (correct + incorrect)}")
+
+
+            
+        
+
 
 # Main function
 if __name__ == "__main__":
@@ -156,7 +199,7 @@ if __name__ == "__main__":
 
 
     # Create a decision tree classifier
-    classifier = DecisionTree(fullData=data, max_depth=5)
+    classifier = DecisionTree(fullData=data, max_depth=10, num_bins=50)
     classifier.train_test_split()
 
     # testing prints
@@ -165,14 +208,14 @@ if __name__ == "__main__":
     # print("Length of X_test:", len(classifier.X_test)) 
     # print("Length of y_test:", len(classifier.y_test))
 
-
     # # Train the decision tree classifier
     classifier.fit()
 
     # # Make predictions on the testing set
-    # y_pred = classifier.predict(X_test)
+    print("\n\n\n TESTING DECISION TREE\n\n\n")
+    classifier.test_decision_tree()
 
-    # # Evaluate the model
-    # accuracy = np.mean(y_pred == y_test)
-    # print("Accuracy:", accuracy)
+    # Evaluate the decision tree classifier
 
+
+    print("\nDone!")
