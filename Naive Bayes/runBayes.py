@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Parameters
-apples, qualities = readApples()
+apples = readApples("../apple_quality.csv")
 numBins = 10
 
 # Run Bayes with Bins
@@ -30,10 +30,6 @@ print("Bayes with Bins:")
 print(testResults)    
 print()
 
-# Run Continuous Bayes
-#print("Continuous Bayes:")
-#contBayes = ContinuousBayes(apples)
-#contBayes.test(contBayes.apples)
 
 """
 # Graph results from Naive Bayes with Bins
@@ -48,7 +44,7 @@ plt.show()
 """
 from sklearn.model_selection import train_test_split
 testRatio = 0.75
-trainingApples, testingApples, _, _ = train_test_split(apples, qualities, test_size = testRatio)
+trainingApples, testingApples = train_test_split(apples, test_size = testRatio)
 splitTestResults = dict()
 for i in range(1, 20):
     binBayes = NaiveBayesBins(trainingApples, i)
@@ -59,7 +55,7 @@ print("Test-Train-Split Bayes with Bins:")
 print(splitTestResults)    
 print()
 
-
+"""
 # Graph results from Naive Bayes with Bins
 plt.bar(list(splitTestResults.keys()), list(splitTestResults.values()))
 plt.yticks(np.arange(0.0, 1.0, 0.1))
@@ -69,3 +65,10 @@ plt.xlabel("Number of Bins")
 plt.ylabel("Prediction Accuracy")
 plt.title("Train-Test Splt Prediction Accuracy vs. Number of Bins")
 plt.show()
+"""
+
+# Run Continuous Bayes
+print("Continuous Bayes:")
+contBayes = ContinuousBayes(apples)
+contBayes.test(contBayes.apples)
+print()

@@ -75,7 +75,8 @@ class ContinuousBayes():
         # Print results        
         if showOutput:        
             print("4000 Predictions completed.")
-            print(f"Score: {correctPredictions} / {numApples} ({correctPredictions / numApples * 100}%)")      
+            percent = round(correctPredictions / numApples * 100, 3)
+            print(f"Score: {correctPredictions} / {numApples} ({percent}%)")      
         
         # Return percent accuracy    
         return correctPredictions / numApples     
