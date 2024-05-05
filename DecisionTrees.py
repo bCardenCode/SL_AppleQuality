@@ -32,19 +32,19 @@ class DecisionTree:
         self.root = self.build_tree(data=self.fullData, depth=0)
 
     def build_tree(self, data, depth):
-        print(f"\n\nBuilding tree at depth: {depth}")
 
         # find best split
         best_gain, best_question = self.find_split(data)
-        print(f"Best Gain: {best_gain}, Best Question: {best_question}")
 
     
         # if no split is found, make the node a leaf node
         if best_gain == 0 or depth >= self.max_depth:
             if best_gain == 0:
-                print("No split found. Making leaf node...")
+                # print("No split found")
+                pass
             if depth >= self.max_depth:
-                print("Max depth reached. Making leaf node...")
+                # print("Max depth reached")
+                pass
 
             num_bad = np.sum(data[:, -1] == 0)
             num_good = np.sum(data[:, -1] == 1)

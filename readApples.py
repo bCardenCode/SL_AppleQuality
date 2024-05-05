@@ -21,6 +21,10 @@ def readApples(fileName = "apple_quality.csv"):
 def readApplesArray(fileName = "apple_quality.csv"):    
     # Read in apple_quality.csv and convert to list of dictionaries
     csv = pd.read_csv(fileName)
+
+    # Read in apple_quality.csv and convert to list of dictionaries
+    csv["Quality"] = csv["Quality"].apply(lambda x: 1 if x == "good" else 0)
+
     return csv.values[:-1]
 
 # Run
