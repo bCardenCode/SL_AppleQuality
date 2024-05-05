@@ -191,10 +191,9 @@ def train_test_split(data, test_ratio=0.2):
     return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
 
 
-def run_multiple(data, saveFile, run_depths):
+def run_multiple(data, saveFile, run_depths, num_runs):
     # train model multiple times with different max_depths
     for depth in run_depths:
-        num_runs = 5
         for _ in range(num_runs):
             start_time = time.time()
 
@@ -238,20 +237,22 @@ if __name__ == "__main__":
     # Load the dataset
     data = readApples.readApplesArray()
     run_depths = [1, 3, 5, 8, 10, 15, 20]
+    num_runs = 1
 
-    # #--------------Self implemented Decision Trees---------------------
-    # saveFile = "results/DTrees_experimentResults.csv"
 
-    # # Clear the contents of saveFile
-    # with open(saveFile, 'w') as file:
-    #     file.truncate(0)
-    #     writer = csv.writer(file)
-    #     writer.writerow(["max_depth", "Accuracy", "Completion Time"]) 
+    #--------------Self implemented Decision Trees---------------------
+    saveFile = "results/DTrees_experimentResults.csv"
 
-    # run_multiple(data, saveFile, run_depths)
+    # Clear the contents of saveFile
+    with open(saveFile, 'w') as file:
+        file.truncate(0)
+        writer = csv.writer(file)
+        writer.writerow(["max_depth", "Accuracy", "Completion Time"]) 
 
-    # plot_results(saveFile)
-    # #---------------------------------End---------------
+    run_multiple(data, saveFile, run_depths, num_runs)
+
+    plot_results(saveFile)
+    #---------------------------------End---------------
 
     
     # --------------SciKit Learn Decision Trees---------------------
@@ -267,7 +268,6 @@ if __name__ == "__main__":
         writer.writerow(["max_depth", "Accuracy", "Completion Time"])
 
     for depth in run_depths:
-        num_runs = 5
         for _ in range(num_runs):
             start_time = time.time()
 
