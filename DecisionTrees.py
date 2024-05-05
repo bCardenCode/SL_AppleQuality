@@ -194,25 +194,27 @@ def train_test_split(data, test_ratio=0.2):
 def run_multiple(data, saveFile, run_depths):
     # train model multiple times with different max_depths
     for depth in run_depths:
-        start_time = time.time()
+        num_runs = 5
+        for _ in range(num_runs):
+            start_time = time.time()
 
-        # Create a decision tree classifier
-        classifier = DecisionTree(fullData=data, max_depth=depth, num_bins=10)
-        classifier.X_train, classifier.X_test, classifier.y_train, classifier.y_test = train_test_split(data)
+            # Create a decision tree classifier
+            classifier = DecisionTree(fullData=data, max_depth=depth, num_bins=10)
+            classifier.X_train, classifier.X_test, classifier.y_train, classifier.y_test = train_test_split(data)
 
-        # # Train the decision tree classifier
-        classifier.fit()
+            # # Train the decision tree classifier
+            classifier.fit()
 
-        # # Make predictions on the testing set
-        print("\n TESTING DECISION TREE:")
-        classifier.test_decision_tree()
+            # # Make predictions on the testing set
+            print("\n TESTING DECISION TREE:")
+            classifier.test_decision_tree()
 
-        end_time = time.time() - start_time
+            end_time = time.time() - start_time
 
-        # save results to a CSV file
-        with open(saveFile, 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([depth, classifier.accuracy, end_time])
+            # save results to a CSV file
+            with open(saveFile, 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([depth, classifier.accuracy, end_time])
 
 
 def plot_results(saveFile):
@@ -233,40 +235,61 @@ def plot_results(saveFile):
 # Main function
 if __name__ == "__main__":
 
-    saveFile = "results/DTrees_experimentResults.csv"
+    # Load the dataset
+    data = readApples.readApplesArray()
+    run_depths = [1, 3, 5, 8, 10, 15, 20]
 
+    # #--------------Self implemented Decision Trees---------------------
+    # saveFile = "results/DTrees_experimentResults.csv"
+
+    # # Clear the contents of saveFile
+    # with open(saveFile, 'w') as file:
+    #     file.truncate(0)
+    #     writer = csv.writer(file)
+    #     writer.writerow(["max_depth", "Accuracy", "Completion Time"]) 
+
+    # run_multiple(data, saveFile, run_depths)
+
+    # plot_results(saveFile)
+    # #---------------------------------End---------------
+
+    
+    # --------------SciKit Learn Decision Trees---------------------
+    print("\n\n\nuse scikit-learn to evaluate the decision tree classifier\n\n\n")
+
+
+    saveFile = "results/SciKit_experimentResults.csv"
+    
     # Clear the contents of saveFile
     with open(saveFile, 'w') as file:
         file.truncate(0)
         writer = csv.writer(file)
         writer.writerow(["max_depth", "Accuracy", "Completion Time"])
 
-    run_depths = [1, 3, 5, 8, 10, 15, 20]
+    for depth in run_depths:
+        num_runs = 5
+        for _ in range(num_runs):
+            start_time = time.time()
 
-    # Load the dataset
-    data = readApples.readApplesArray()
+        
+            X_train, X_test, y_train, y_test = train_test_split(data)
 
-    run_multiple(data, saveFile, run_depths)
+            y_train=y_train.astype('int')    
+            
+            # Create a decision tree classifier
+            clf = DecisionTreeClassifier(criterion='gini', max_depth=depth)
 
-    plot_results(saveFile)
+            clf.fit(X_train, y_train)
+            y_pred = clf.predict(X_test)
+            print("Accuracy with scikit learn:", np.mean(y_pred == y_test))
 
+            end_time = time.time() - start_time
 
-    
-    # Evaluate the decision tree classifier
-
-    print("\n\n\nuse scikit-learn to evaluate the decision tree classifier\n\n\n")
-
-    X_train, X_test, y_train, y_test = train_test_split(data)
-
-    y_train=y_train.astype('int')    
-    
-    # Create a decision tree classifier
-    clf = DecisionTreeClassifier(criterion='gini', max_depth=5)
-
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-    print("Accuracy with scikit learn:", np.mean(y_pred == y_test))
-
+            # save results to a CSV file
+            with open(saveFile, 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([depth, np.mean(y_pred == y_test), end_time])
+    #---------------------------------End---------------
 
 
     print("\nDone!")

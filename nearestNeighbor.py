@@ -166,12 +166,13 @@ if __name__ == "__main__":
 
 
     # # run multiple expiriments
-    for _ in range(1):
-         ks = [1, 3, 5, 8, 10, 15, 20]
-         for k in ks:
-             model = nearestNeighbor(k=k)
-             trainingLengths = [0.75]
-             runAndSaveExpiriment(model, trainingLengths, saveFile)
+    ks = [1, 3, 5, 8, 10, 15, 20]
+    for k in ks:
+        num_runs = 5
+        for _ in range(num_runs):
+            model = nearestNeighbor(k=k)
+            trainingLengths = [0.75]
+            runAndSaveExpiriment(model, trainingLengths, saveFile)
 
     # # run one expiriment
     # model = nearestNeighbor(k=1)
