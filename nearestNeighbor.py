@@ -4,6 +4,7 @@ import math
 import csv
 import time
 import pandas as pd
+import os
 import matplotlib.pyplot as plt
 
 class nearestNeighbor():
@@ -133,8 +134,6 @@ def graphExpirement(fileName):
 
 
 
-
-
     accuracies = data['Accuracy']
     trainingLengths = data['k']
     plt.plot(trainingLengths, accuracies)
@@ -154,16 +153,32 @@ def graphExpirement(fileName):
     plt.show()
 
 
-if __name__ == "__main__":
-    # for _ in range(1):
-    #      ks = [1, 3, 5, 10, 15, 20]
-    #      for k in range(25, 26):
-    #          model = nearestNeighbor(k=k)
-    #          trainingLengths = [0.75]
-    #          runAndSaveExpiriment(model, trainingLengths)
-        
 
-    graphExpirement(fileName="results/experimentResults_kvsaccuracy.csv")
+if __name__ == "__main__":
+    saveFile = "results/experimentResults.csv"
+
+    # Clear the contents of saveFile
+    with open(saveFile, 'w') as file:
+        file.truncate(0)
+        writer = csv.writer(file)
+        writer.writerow(["k", "Training Length", "Accuracy", "Completion Time"])
+
+
+
+    # # run multiple expiriments
+    for _ in range(1):
+         ks = [1, 3, 5, 10, 15, 20]
+         for k in ks:
+             model = nearestNeighbor(k=k)
+             trainingLengths = [0.75]
+             runAndSaveExpiriment(model, trainingLengths)
+
+    # # run one expiriment
+    # model = nearestNeighbor(k=1)
+    # runAndSaveExpiriment(model, [0.75])
+
+
+    graphExpirement(fileName=saveFile)
 
     print("\n\n FINISH  \n\n")
   
