@@ -102,7 +102,7 @@ def saveToCSV(filename, data):
         writer.writerows(data)
 
     
-def runAndSaveExpiriment(model, trainingLengths):
+def runAndSaveExpiriment(model, trainingLengths, saveFile):
     data = []
     for length in trainingLengths:
         start_time = time.time()
@@ -123,7 +123,7 @@ def runAndSaveExpiriment(model, trainingLengths):
         print("done")
     
     # save data from multiple runs to a CSV file
-    with open(f"results/experimentResults.csv", 'a', newline='') as file:
+    with open(saveFile, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data)
 
@@ -155,7 +155,7 @@ def graphExpirement(fileName):
 
 
 if __name__ == "__main__":
-    saveFile = "results/experimentResults.csv"
+    saveFile = "results/knn_experimentResults.csv"
 
     # Clear the contents of saveFile
     with open(saveFile, 'w') as file:
@@ -167,11 +167,11 @@ if __name__ == "__main__":
 
     # # run multiple expiriments
     for _ in range(1):
-         ks = [1, 3, 5, 10, 15, 20]
+         ks = [1, 3, 5, 8, 10, 15, 20]
          for k in ks:
              model = nearestNeighbor(k=k)
              trainingLengths = [0.75]
-             runAndSaveExpiriment(model, trainingLengths)
+             runAndSaveExpiriment(model, trainingLengths, saveFile)
 
     # # run one expiriment
     # model = nearestNeighbor(k=1)

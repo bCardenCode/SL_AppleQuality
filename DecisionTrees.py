@@ -1,6 +1,10 @@
 import numpy as np
 import readApples
 from sklearn.tree import DecisionTreeClassifier
+import csv
+import time
+import matplotlib.pyplot as plt
+import pandas as pd
 
 class Node:
     def __init__(self, data=None, true_node=None,false_node=None, question = None, pred_class=None, is_leaf=False, depth=0):
@@ -22,6 +26,7 @@ class DecisionTree:
         self.fullData = fullData
         self.num_features = len(fullData[0])-2
         self.num_bins = num_bins
+        self.accuracy = 0
         self.X_train = None
         self.y_train = None
         self.X_test = None
@@ -168,6 +173,7 @@ class DecisionTree:
                 incorrect += 1
 
         print(f"Correct: {correct}, Incorrect: {incorrect}, Accuracy: {correct / (correct + incorrect)}")
+        self.accuracy = correct / (correct + incorrect)
 
 
             
@@ -185,25 +191,67 @@ def train_test_split(data, test_ratio=0.2):
     return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
 
 
+def run_multiple(data, saveFile, run_depths):
+    # train model multiple times with different max_depths
+    for depth in run_depths:
+        start_time = time.time()
+
+        # Create a decision tree classifier
+        classifier = DecisionTree(fullData=data, max_depth=depth, num_bins=10)
+        classifier.X_train, classifier.X_test, classifier.y_train, classifier.y_test = train_test_split(data)
+
+        # # Train the decision tree classifier
+        classifier.fit()
+
+        # # Make predictions on the testing set
+        print("\n TESTING DECISION TREE:")
+        classifier.test_decision_tree()
+
+        end_time = time.time() - start_time
+
+        # save results to a CSV file
+        with open(saveFile, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([depth, classifier.accuracy, end_time])
+
+
+def plot_results(saveFile):
+    # Plot the results
+    results = pd.read_csv(saveFile)
+    accuracies = results['Accuracy']
+    trainingLengths = results['max_depth']
+    plt.plot(trainingLengths, accuracies)
+
+
+    plt.xlabel("max_depth")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy vs max_depth")
+    plt.show()
+
+
 
 # Main function
 if __name__ == "__main__":
+
+    saveFile = "results/DTrees_experimentResults.csv"
+
+    # Clear the contents of saveFile
+    with open(saveFile, 'w') as file:
+        file.truncate(0)
+        writer = csv.writer(file)
+        writer.writerow(["max_depth", "Accuracy", "Completion Time"])
+
+    run_depths = [1, 3, 5, 8, 10, 15, 20]
+
     # Load the dataset
     data = readApples.readApplesArray()
 
+    run_multiple(data, saveFile, run_depths)
 
-    # Create a decision tree classifier
-    classifier = DecisionTree(fullData=data, max_depth=5, num_bins=10)
+    plot_results(saveFile)
 
-    classifier.X_train, classifier.X_test, classifier.y_train, classifier.y_test = train_test_split(data)
 
-    # # Train the decision tree classifier
-    classifier.fit()
-
-    # # Make predictions on the testing set
-    print("\n\n\n TESTING DECISION TREE\n\n\n")
-    classifier.test_decision_tree()
-
+    
     # Evaluate the decision tree classifier
 
     print("\n\n\nuse scikit-learn to evaluate the decision tree classifier\n\n\n")
