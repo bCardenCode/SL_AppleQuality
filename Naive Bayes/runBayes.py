@@ -21,7 +21,7 @@ numBins = 10
 # Run Bayes with Bins
 # Dict --> Number Bins : Prediction Accuracy
 testResults = dict()
-for i in range(1, 20):
+for i in range(1, numBins):
     binBayes = NaiveBayesBins(apples, i)
     binBayes.train()
     testResults[i] = binBayes.test(binBayes.apples, showOutput = False)
@@ -46,7 +46,7 @@ from sklearn.model_selection import train_test_split
 testRatio = 0.75
 trainingApples, testingApples = train_test_split(apples, test_size = testRatio)
 splitTestResults = dict()
-for i in range(1, 20):
+for i in range(1, numBins):
     binBayes = NaiveBayesBins(trainingApples, i)
     binBayes.train()
     splitTestResults[i] = binBayes.test(testingApples, showOutput = False)

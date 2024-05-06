@@ -36,5 +36,6 @@ This is the repository for the Supervised Learning project to predict Apple Qual
 - There are 2 class files for Naive Bayes: `NaiveBayesBins` and `ContinuousBayes`
 - Both are contained in `runBayes.py`
     - For this file, you can edit `numBins` and `testRatio`
+    - Both graphs are currently commented out
 
 - To run, execute `python3 runBayes.py` in terminal    
