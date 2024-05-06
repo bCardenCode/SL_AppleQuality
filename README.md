@@ -24,7 +24,7 @@ This is the repository for the Supervised Learning project to predict Apple Qual
 
 ### Running Perceptron
 
-- Navigate to the file titled 'runPerceptron.py'
+- Navigate to the file titled `runPerceptron.py`
     - The file contains a perceptron that trains and tests on the entire dataset and a perceptron that splits training adn testing data
     - You can change the variable `trainingIterations` and `testRatio` if desired
     - Currently, the program will display a graph showing results of the split dataset, a graph showing results from the first perceptron are commented out
